@@ -1,7 +1,6 @@
 import { fetchPosts, fetchPostData, fetchPostComments } from '@/api/posts';
 import BackButton from '@/components/BackButton';
-import LinePlot from '@/components/LinePlot';
-import Skeleton from '@/components/Skeleton';
+import BarGraph from '@/components/BarGraph';
 import SubSection from '@/components/SubSection';
 
 export async function generateStaticParams() {
@@ -74,7 +73,9 @@ export default async function Page({ params }: { params: { id: string } }) {
           </section>
         </div>
 
-        <div></div>
+        <div>
+          <BarGraph />
+        </div>
       </div>
     </div>
   );
