@@ -34,6 +34,9 @@ async function getPostData(id: string) {
 
 export default async function Page({ params }: { params: { id: string } }) {
   const post = await getPostData(params.id);
+  const sortedData = post.comments.sort(
+    (a, b) => a.body.length - b.body.length,
+  );
 
   return (
     <div className='py-6 px-2 md:px-4 xl:px-0'>
@@ -73,15 +76,13 @@ export default async function Page({ params }: { params: { id: string } }) {
           </section>
         </div>
 
-        <div>
-          <BarGraph
-            data={post.comments}
-            xAxisLabel='Post ID'
-            yAxisLabel='Comment Length'
-            xAxis={post.comments.map((comment) => comment.id)}
-            yAxis={post.comments.map((comment) => comment.body.length)}
-          />
-        </div>
+        <BarGraph
+          data={sortedData.map((comment) => comment.id.toString())}
+          xAxisLabel='Post ID'
+          yAxisLabel='Comment Length'
+          xAxis={sortedData.map((comment) => comment.id)}
+          yAxis={sortedData.map((comment) => comment.body.length)}
+        />
       </div>
     </div>
   );

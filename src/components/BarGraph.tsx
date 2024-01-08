@@ -1,12 +1,11 @@
 'use client';
-import { useRef, useEffect } from 'react';
+import { useRef, useEffect, useState } from 'react';
 import * as d3 from 'd3';
 
-type BarGraphProps<TData> = {
-  data: TData[];
+type BarGraphProps = {
+  data: string[];
   xAxis: number[];
   yAxis: number[];
-  width?: number;
   height?: number;
   marginLeft?: number;
   marginRight?: number;
@@ -16,64 +15,107 @@ type BarGraphProps<TData> = {
   yAxisLabel?: string;
 };
 
-export default function BarGraph<TData>({
+export default function BarGraph({
   data,
-  width = 640,
   height = 400,
   marginLeft = 40,
-  marginRight = 40,
   marginBottom = 40,
   marginTop = 40,
-  xAxis,
   yAxis,
   xAxisLabel,
   yAxisLabel,
-}: BarGraphProps<TData>) {
+}: BarGraphProps) {
+  const container = useRef<HTMLDivElement>(null);
   const gx = useRef<SVGGElement>(null);
   const gy = useRef<SVGGElement>(null);
 
-  const yExtent = d3.extent(yAxis) as [number, number];
-  const xExtent = d3.extent(xAxis) as [number, number];
-  const x = d3.scaleLinear(xExtent, [marginLeft, width - marginRight]);
-  const y = d3.scaleLinear(yExtent, [height - marginTop, marginBottom]);
+  const [width, setWidth] = useState(0);
+  const boundsWidth = width;
+  const boundsHeight = height - marginBottom - marginTop;
+
+  const y = d3.scaleLinear([0, yAxis[yAxis.length - 1]], [boundsHeight, 0]);
+  const x = d3
+    .scaleBand()
+    .domain(data)
+    .range([marginLeft, boundsWidth])
+    .padding(0.5);
+
+  const bars = data.map((d, i) => {
+    if (x(d) === undefined) {
+      return null;
+    }
+
+    return (
+      <g key={i}>
+        <rect
+          x={x(d)}
+          y={`${y(yAxis[i]) + marginBottom}`}
+          width={x.bandwidth()}
+          height={`${boundsHeight - y(yAxis[i])}`}
+          fill='#69b3a2'
+          fillOpacity={0.4}
+          stroke='#69b3a2'
+          strokeWidth={1}
+        />
+        <text
+          fill='currentColor'
+          textAnchor='end'
+          fontSize='12'
+          x={`${(x(d) ?? 0) + x.bandwidth() - 15}`}
+          y={`${y(yAxis[i]) + marginBottom - 8}`}>
+          {yAxis[i]}
+        </text>
+      </g>
+    );
+  });
 
   useEffect(() => {
-    if (gx.current) {
-      d3.select(gx.current).call(
-        d3.axisBottom(x).tickValues(xAxis).tickFormat(d3.format('.0f')),
-      );
+    // TODO: Make it responsive
+    if (container.current) {
+      setWidth(container.current.offsetWidth);
     }
-  }, [x, gx, xAxis]);
+  }, [container]);
 
   useEffect(() => {
     if (gy.current) {
       d3.select(gy.current).call(d3.axisLeft(y));
     }
-  }, [y, gy]);
+  }, [gy, y]);
+
+  useEffect(() => {
+    if (gx.current) {
+      d3.select(gx.current).call(d3.axisBottom(x));
+    }
+  }, [gx, x]);
 
   return (
-    <svg width={width} height={height}>
-      <g ref={gx} transform={`translate(0, ${height - marginBottom})`} />
-      {!!xAxisLabel && (
-        <text
-          textAnchor='middle'
-          fill='currentColor'
-          className='text-xs'
-          x={width / 2}
-          y={height}>
-          {xAxisLabel}
-        </text>
-      )}
-      {!!yAxisLabel && (
-        <text
-          textAnchor='middle'
-          fill='currentColor'
-          className='text-xs -rotate-90 translate-y-1/2'
-          y={10}>
-          {yAxisLabel}
-        </text>
-      )}
-      <g ref={gy} transform={`translate(${marginLeft}, 0)`} />
-    </svg>
+    <div ref={container}>
+      <svg width={width} height={height}>
+        <g ref={gx} transform={`translate(0, ${height - marginBottom})`}>
+          {!!xAxisLabel && (
+            <text
+              textAnchor='middle'
+              fill='currentColor'
+              className='text-xs'
+              x={(width + marginLeft) / 2}
+              y={marginBottom}>
+              {xAxisLabel}
+            </text>
+          )}
+        </g>
+        <g ref={gy} transform={`translate(${marginLeft}, ${marginTop})`}>
+          {!!yAxisLabel && (
+            <text
+              textAnchor='middle'
+              fill='currentColor'
+              className='text-xs -rotate-90 translate-y-1/2'
+              y={-30}>
+              {yAxisLabel}
+            </text>
+          )}
+        </g>
+        {bars}
+      </svg>
+    </div>
   );
 }
