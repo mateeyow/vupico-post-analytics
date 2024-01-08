@@ -74,7 +74,13 @@ export default async function Page({ params }: { params: { id: string } }) {
         </div>
 
         <div>
-          <BarGraph />
+          <BarGraph
+            data={post.comments}
+            xAxisLabel='Post ID'
+            yAxisLabel='Comment Length'
+            xAxis={post.comments.map((comment) => comment.id)}
+            yAxis={post.comments.map((comment) => comment.body.length)}
+          />
         </div>
       </div>
     </div>

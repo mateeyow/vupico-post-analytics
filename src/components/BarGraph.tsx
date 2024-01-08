@@ -2,38 +2,48 @@
 import { useRef, useEffect } from 'react';
 import * as d3 from 'd3';
 
-const data = [1, 2, 3, 4, 5, 6, 4, 8, 9];
-const words = [100, 200, 300, 400, 500, 600];
-
-type BarGraphProps = {
+type BarGraphProps<TData> = {
+  data: TData[];
+  xAxis: number[];
+  yAxis: number[];
   width?: number;
   height?: number;
   marginLeft?: number;
   marginRight?: number;
   marginTop?: number;
   marginBottom?: number;
+  xAxisLabel?: string;
+  yAxisLabel?: string;
 };
 
-export default function BarGraph({
+export default function BarGraph<TData>({
+  data,
   width = 640,
   height = 400,
   marginLeft = 40,
   marginRight = 40,
   marginBottom = 40,
   marginTop = 40,
-}: BarGraphProps) {
+  xAxis,
+  yAxis,
+  xAxisLabel,
+  yAxisLabel,
+}: BarGraphProps<TData>) {
   const gx = useRef<SVGGElement>(null);
   const gy = useRef<SVGGElement>(null);
 
-  const extent = d3.extent(words) as [number, number];
-  const x = d3.scaleLinear([0, data.length], [marginLeft, width - marginRight]);
-  const y = d3.scaleLinear(extent, [height - marginTop, marginBottom]);
+  const yExtent = d3.extent(yAxis) as [number, number];
+  const xExtent = d3.extent(xAxis) as [number, number];
+  const x = d3.scaleLinear(xExtent, [marginLeft, width - marginRight]);
+  const y = d3.scaleLinear(yExtent, [height - marginTop, marginBottom]);
 
   useEffect(() => {
     if (gx.current) {
-      d3.select(gx.current).call(d3.axisBottom(x));
+      d3.select(gx.current).call(
+        d3.axisBottom(x).tickValues(xAxis).tickFormat(d3.format('.0f')),
+      );
     }
-  }, [x, gx]);
+  }, [x, gx, xAxis]);
 
   useEffect(() => {
     if (gy.current) {
@@ -44,35 +54,26 @@ export default function BarGraph({
   return (
     <svg width={width} height={height}>
       <g ref={gx} transform={`translate(0, ${height - marginBottom})`} />
+      {!!xAxisLabel && (
+        <text
+          textAnchor='middle'
+          fill='currentColor'
+          className='text-xs'
+          x={width / 2}
+          y={height}>
+          {xAxisLabel}
+        </text>
+      )}
+      {!!yAxisLabel && (
+        <text
+          textAnchor='middle'
+          fill='currentColor'
+          className='text-xs -rotate-90 translate-y-1/2'
+          y={10}>
+          {yAxisLabel}
+        </text>
+      )}
       <g ref={gy} transform={`translate(${marginLeft}, 0)`} />
     </svg>
   );
 }
-
-//   width = 640,
-//   height = 400,
-//   marginTop = 20,
-//   marginRight = 20,
-//   marginBottom = 20,
-//   marginLeft = 20
-// const x = d3.scaleLinear(
-//   [0, data.length - 1],
-//   [marginLeft, width - marginRight]
-// );
-// const y = d3.scaleLinear(d3.extent(data), [height - marginBottom, marginTop]);
-// const line = d3.line((d, i) => x(i), y);
-// return (
-//   <svg width={width} height={height}>
-//     <path
-//       fill="none"
-//       stroke="currentColor"
-//       stroke-width="1.5"
-//       d={line(data)}
-//     />
-//     <g fill="white" stroke="currentColor" stroke-width="1.5">
-//       {data.map((d, i) => (
-//         <circle key={i} cx={x(i)} cy={y(d)} r="2.5" />
-//       ))}
-//     </g>
-//   </svg>
-// );
