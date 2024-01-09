@@ -1,7 +1,7 @@
 'use client';
 import { useRouter } from 'next/navigation';
 
-export default function BackButton() {
+export default function BackButton({ msg }: { msg: string }) {
   const router = useRouter();
 
   return (
@@ -22,7 +22,7 @@ export default function BackButton() {
           d='M13 5H1m0 0 4 4M1 5l4-4'
         />
       </svg>
-      <span>Back to Posts</span>
+      <span>{msg}</span>
     </button>
   );
 }

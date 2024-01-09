@@ -1,0 +1,25 @@
+{
+  "Layout": {
+    "title": "Vupico Post Analytics",
+    "description": "App to analyze your posts and comments."
+  },
+  "404": {
+    "title": "404! Page not found",
+    "linkMsg": "Return Home"
+  },
+  "Navigation": {
+    "posts": "Posts",
+    "locale": "{locale, select, en {English} zh {中文} other {English}}"
+  },
+  "PostCard": {
+    "by": "By: {name}",
+    "linkMsg": "Read Full Post"
+  },
+  "PostDetail": {
+    "back": "Back to Posts",
+    "comments": "Comments",
+    "commentDomains": "Comment Domains",
+    "commentLength": "Comment Length",
+    "commentTable": "Comments Table"
+  }
+}

@@ -1,0 +1,25 @@
+{
+  "Layout": {
+    "title": "Vupico 邮政分析",
+    "description": "用于分析您的帖子和评论的应用程序。"
+  },
+  "404": {
+    "title": "第404章 找不到网页",
+    "linkMsg": "回家"
+  },
+  "Navigation": {
+    "posts": "帖子",
+    "locale": "{locale, select, en {English} zh {中文} other {English}}"
+  },
+  "PostCard": {
+    "by": "经过： {name}",
+    "linkMsg": "阅读全文"
+  },
+  "PostDetail": {
+    "back": "返回帖子",
+    "comments": "评论",
+    "commentDomains": "评论域",
+    "commentLength": "评论长度",
+    "commentTable": "评论表"
+  }
+}
